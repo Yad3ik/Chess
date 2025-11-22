@@ -46,6 +46,69 @@ struct Board {
   bool white_threat[8][8];
   bool black_threat[8][8];
   char current_move;
+
+  std::vector<Point> dostig(BaseFigure* f, Point p) {
+    char this_name = board[p.x][p.y].f->name;
+    std::vector<Point> answer;
+
+    if (this_name == 'N'){
+      for(auto x : board[p.x][p.y].f->ach(p, board[p.x][p.y].col_of_figure)){
+        if (board[x.x][x.y].col_of_figure != board[p.x][p.y].col_of_figure){
+          answer.push_back(x);
+        }
+      }
+      return answer;
+    }
+
+    if(this_name == 'R'){
+      for(auto x : board[p.x][p.y].f->ach(p, board[p.x][p.y].col_of_figure)){
+        if (p.x == x.x){
+          if (p.y > x.y){
+            for (int i = p.y; i >= x.y; --i){
+              if (board[p.x][i].col_of_figure == 'e'){
+                answer.push_back(x);
+              } else if (board[p.x][i].col_of_figure != board[p.x][p.y].col_of_figure && board[p.x][i + 1].col_of_figure == 'e'){
+                answer.push_back(x);
+              }
+            }
+          }
+
+          if (p.y < x.y){
+            for (int i = p.y; i <= x.y; ++i){
+              if (board[p.x][i].col_of_figure == 'e'){
+                answer.push_back(x);
+              } else if (board[p.x][i].col_of_figure != board[p.x][p.y].col_of_figure && board[p.x][i - 1].col_of_figure == 'e'){
+                answer.push_back(x);
+              }
+            }
+          }
+        }
+
+        if (p.y == x.y){
+          if (p.x > x.x){
+            for (int i = p.x; i >= x.x; --i){
+              if (board[i][p.y].col_of_figure == 'e'){
+                answer.push_back(x);
+              } else if (board[i][p.y].col_of_figure != board[p.x][p.y].col_of_figure && board[i + 1][p.y].col_of_figure == 'e'){
+                answer.push_back(x);
+              }
+            }
+          }
+          if (p.x < x.x){
+            for (int i = p.x; i <= x.x; ++i){
+              if (board[i][p.y].col_of_figure == 'e'){
+                answer.push_back(x);
+              } else if (board[i][p.y].col_of_figure != board[p.x][p.y].col_of_figure && board[i - 1][p.y].col_of_figure == 'e'){
+                answer.push_back(x);
+              }
+            }
+          }
+        }
+      }
+      return answer;
+    }
+    return answer;
+  }
   
   void StartPosition() {
     Clear();
@@ -144,6 +207,7 @@ struct Board {
     for (int i = 0; i < 26; ++i) {
       for (int j = 0; j < 26; ++j) {
         char ch = picture[j][25 - i];
+        /*
         if (ch == 'N' or ch == 'B' or ch == 'R' or ch == 'Q' or ch == 'K' or ch == 'P') {
           if (color[j][25 - i]) std::cout << "\x1b[33m" << ch  << "\x1b[0m" << "  ";
           else std::cout << "\x1b[34m" << ch  << "\x1b[0m" << "  ";
@@ -152,7 +216,8 @@ struct Board {
         } else {
           std::cout << ch << "  ";
         }
-
+        */
+        std::cout << ch << "  ";
       }
       std::cout << "\n";
     }
@@ -172,6 +237,7 @@ struct Board {
     if (flag == false) {
       return false;
     }
-
+    
+    return true;
   }
 };
