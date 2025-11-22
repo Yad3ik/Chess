@@ -1,5 +1,5 @@
-#include <iostream>
 #include "chessboard.hpp"
+#include <iostream>
 // #include <windows.h>
 
 /*
@@ -17,9 +17,17 @@ void enable_ansi_colors() {
 
 int main() {
   // enable_ansi_colors();
-  
+
   Board b;
   b.StartPosition();
-
+  std::string move;
+  while (true) {
+    std::cin >> move;
+    if (b.Make_move(move)) {
+      b.Print();
+    } else {
+      std::cout << "Invalid move" << std::endl;
+    }
+  }
   return 0;
 }
