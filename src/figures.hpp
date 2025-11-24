@@ -70,7 +70,7 @@ struct Pawn : BaseFigure {
     std::vector<Point> answer;
     for (int i = 0; i < 8; ++i) {
       for (int j = 0; j < 8; ++j) {
-        if (std::abs(p.x - i) == 1 and p.y == j + 1) {
+        if (std::abs(p.x - i) == 1 and (p.y + 1 == j || p.y - 1 == j)) {
           answer.push_back(Point(i, j));
         }
       }
@@ -91,6 +91,9 @@ struct Pawn : BaseFigure {
       if (p.y == 6) {
         answer.push_back(Point(p.x, p.y - 2));
       }
+    }
+    for (auto x : threat(p)) {
+      answer.push_back(x);
     }
     return answer;
   }

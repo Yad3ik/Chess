@@ -1,8 +1,8 @@
+#include <algorithm>
 #include "chessboard.hpp"
 #include <iostream>
-// #include <windows.h>
+#include <windows.h>
 
-/*
 void enable_ansi_colors() {
   HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
   if (hOut == INVALID_HANDLE_VALUE) return;
@@ -13,18 +13,18 @@ void enable_ansi_colors() {
   mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
   SetConsoleMode(hOut, mode);
 }
-*/
 
 int main() {
-  // enable_ansi_colors();
+  enable_ansi_colors();
 
   Board b;
   b.StartPosition();
   std::string move;
   while (true) {
-    std::cin >> move;
+    std::getline(std::cin, move);
     if (b.Make_move(move)) {
       b.Print();
+      b.current_move = b.current_move == 'w' ? 'b' : 'w';
     } else {
       std::cout << "Invalid move" << std::endl;
     }
