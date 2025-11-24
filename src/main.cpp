@@ -24,7 +24,12 @@ int main() {
     std::getline(std::cin, move);
     if (b.Make_move(move)) {
       b.Print();
-      b.current_move = b.current_move == 'w' ? 'b' : 'w';
+      if (b.current_move == 'b') {
+        b.current_move = 'w';
+      } else {
+        b.current_move = 'b';
+      }
+      std::cout << b.current_move << "\n";
     } else {
       std::cout << "Invalid move" << std::endl;
     }

@@ -2,6 +2,15 @@
 #include <iostream>
 #include <string>
 
+
+bool Find(std::vector<Point> f, Point p) {
+  for (auto x : f) {
+    if (x == p) {
+      return true;
+    }
+  }
+  return false;
+}
 /*
 N - конь
 B - слон
@@ -509,6 +518,23 @@ struct Board {
     }
   }
 
+  std::vector<Point> bit_field(char color) {
+    std::vector<Point> bit;
+    for (int i = 0; i < 8; ++i) {
+      for (int j = 0; j < 8; ++j) {
+        if (board[i][j].col_of_figure == color && board[i][j].f->name != 'K') {
+          for (auto x : dostig(board[i][j].f, Point(i, j))) {
+            bit.push_back(x);
+          }
+        } else if (board[i][j].col_of_figure == color && board[i][j].f->name == 'K') {
+          for (auto x : board[i][j].f->ach(Point(i , j), color)) {
+            bit.push_back(x);
+          }
+        }
+      }
+    }
+  }
+
   bool Is_possible(char name, Point first, Point second) {
     if (board[first.x][first.y].f == nullptr or board[first.x][first.y].f->name != name or first == second) {
       return false;
@@ -657,6 +683,27 @@ struct Board {
           board[first.x][first.y].col_of_figure;
       board[first.x][first.y].f = nullptr;
       board[first.x][first.y].col_of_figure = 'e';
+
+
+      for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+          if (current_move == 'w') {
+            if (Find(bit_field('w'), Point(i , j))) {
+              white_threat[i][j] = true;
+            } else {
+              white_threat[i][j] = false;
+            }
+          } else {
+            if (Find(bit_field('b'), Point(i , j))) {
+              white_threat[i][j] = true;
+            } else {
+              white_threat[i][j] = false;
+            }
+          }
+
+        }
+      }
+
       return true;
     }
     return false;
