@@ -2,40 +2,6 @@
 #include <iostream>
 #include <string>
 
-/*
-N - конь
-B - слон
-K - король
-Q - ферзь
-P - пешка
-R - ладья
-
-1. Класс фигур(базовые фигуры) - наследникки все фигуры
- В классе фигур храниться :
- 1. функция опрделения биитых
- 2. функция достижимых(куда можжно пойти)
- 3. char Name
-2. Класс каждой фигуры
- 1. функция переопределния битых полей
- 2. Для пешки отдельная функкция достижимых
-3. Поле (как одна клетка) (field)
- 1.цвет поля
- 2.цвет фигуры
- 3.указатель на базовую фигуру
-4. Класс доска (board)
- 1.Массив массив(field board[8][8])
- 2.проверка хода(
-   1.Та ли фигура(цвет и введеное знач)
-   2.Входит ли втроавя координата в функццию достижимых
-   3.Есть ли на пути хода преграды? (для каждой сво проврека))
- 3. Две будевых доски ждя белых и черных битые поля
- 4. Функция хода(
-   0. Уникальность хода
-   1. вызов is_possible(Фигура, координаты 1, координаты 2)
-   2.переставнока на field
-   3. Обновление битых полей БЧ)
-*/
-
 struct Field {
   char col_of_field;
   char col_of_figure = 'e';
@@ -50,6 +16,7 @@ struct Board {
   // 0 - white king, 1 - black king, 2 - white left rook, 3 - white right rook,
   // 4 - black left rook, 5 - black right rook
   int move_number[6];
+  std::vector<std::string> history;
 
   std::vector<Point> dostig(BaseFigure *f, Point p) {
     char this_name = board[p.x][p.y].f->name;
@@ -72,7 +39,8 @@ struct Board {
                 answer.push_back(Point(p.x, i));
               } else if (board[p.x][i].col_of_figure !=
                              board[p.x][p.y].col_of_figure &&
-                         (board[p.x][i + 1].col_of_figure == 'e' or i + 1 == p.y)) {
+                         (board[p.x][i + 1].col_of_figure == 'e' or
+                          i + 1 == p.y)) {
                 answer.push_back(Point(p.x, i));
                 break;
               } else {
@@ -84,14 +52,15 @@ struct Board {
           if (p.y < x.y) {
             for (int i = p.y + 1; i <= x.y; ++i) {
               if (board[p.x][i].col_of_figure == 'e') {
-                answer.push_back(Point(p.x,i));
+                answer.push_back(Point(p.x, i));
               } else if (board[p.x][i].col_of_figure !=
                              board[p.x][p.y].col_of_figure &&
-                         (board[p.x][i - 1].col_of_figure == 'e' or i - 1 == p.y)) {
-                answer.push_back(Point(p.x,i));
+                         (board[p.x][i - 1].col_of_figure == 'e' or
+                          i - 1 == p.y)) {
+                answer.push_back(Point(p.x, i));
                 break;
               } else if (board[p.x][i].col_of_figure ==
-                             board[p.x][p.y].col_of_figure) {
+                         board[p.x][p.y].col_of_figure) {
                 break;
               }
             }
@@ -105,11 +74,12 @@ struct Board {
                 answer.push_back(Point(i, p.y));
               } else if (board[i][p.y].col_of_figure !=
                              board[p.x][p.y].col_of_figure &&
-                         (board[i + 1][p.y].col_of_figure == 'e' or i + 1 == p.x)) {
+                         (board[i + 1][p.y].col_of_figure == 'e' or
+                          i + 1 == p.x)) {
                 answer.push_back(Point(i, p.y));
                 break;
               } else if (board[i][p.y].col_of_figure ==
-                             board[p.x][p.y].col_of_figure) {
+                         board[p.x][p.y].col_of_figure) {
                 break;
               }
             }
@@ -120,7 +90,8 @@ struct Board {
                 answer.push_back(Point(i, p.y));
               } else if (board[i][p.y].col_of_figure !=
                              board[p.x][p.y].col_of_figure &&
-                         (board[i - 1][p.y].col_of_figure == 'e' or i - 1 == p.x)) {
+                         (board[i - 1][p.y].col_of_figure == 'e' or
+                          i - 1 == p.x)) {
                 answer.push_back(Point(i, p.y));
                 break;
               } else {
@@ -141,7 +112,8 @@ struct Board {
                 answer.push_back(Point(i, j));
               } else if (board[i][j].col_of_figure !=
                              board[p.x][p.y].col_of_figure &&
-                         (board[i + 1][j + 1].col_of_figure == 'e' or Point(i + 1, j + 1) == p)) {
+                         (board[i + 1][j + 1].col_of_figure == 'e' or
+                          Point(i + 1, j + 1) == p)) {
                 answer.push_back(Point(i, j));
               } else {
                 break;
@@ -155,7 +127,8 @@ struct Board {
                 answer.push_back(Point(i, j));
               } else if (board[i][j].col_of_figure !=
                              board[p.x][p.y].col_of_figure &&
-                         (board[i - 1][j - 1].col_of_figure == 'e' or Point(i - 1, j - 1) == p)) {
+                         (board[i - 1][j - 1].col_of_figure == 'e' or
+                          Point(i - 1, j - 1) == p)) {
                 answer.push_back(Point(i, j));
               } else {
                 break;
@@ -171,7 +144,8 @@ struct Board {
                 answer.push_back(x);
               } else if (board[i][j].col_of_figure !=
                              board[p.x][p.y].col_of_figure &&
-                         (board[i + 1][j - 1].col_of_figure == 'e' or Point(i + 1, j - 1) == p)) {
+                         (board[i + 1][j - 1].col_of_figure == 'e' or
+                          Point(i + 1, j - 1) == p)) {
                 answer.push_back(Point(i, j));
               } else {
                 break;
@@ -184,7 +158,8 @@ struct Board {
                 answer.push_back(x);
               } else if (board[i][j].col_of_figure !=
                              board[p.x][p.y].col_of_figure &&
-                         (board[i - 1][j + 1].col_of_figure == 'e' or Point(i - 1, j + 1) == p)) {
+                         (board[i - 1][j + 1].col_of_figure == 'e' or
+                          Point(i - 1, j + 1) == p)) {
                 answer.push_back(Point(i, j));
               } else {
                 break;
@@ -204,7 +179,8 @@ struct Board {
                 answer.push_back(Point(i, j));
               } else if (board[i][j].col_of_figure !=
                              board[p.x][p.y].col_of_figure &&
-                         (board[i + 1][j + 1].col_of_figure == 'e' or Point(i + 1, j + 1) == p)) {
+                         (board[i + 1][j + 1].col_of_figure == 'e' or
+                          Point(i + 1, j + 1) == p)) {
                 answer.push_back(Point(i, j));
               } else {
                 break;
@@ -218,7 +194,8 @@ struct Board {
                 answer.push_back(Point(i, j));
               } else if (board[i][j].col_of_figure !=
                              board[p.x][p.y].col_of_figure &&
-                         (board[i - 1][j - 1].col_of_figure == 'e' or Point(i - 1, j - 1) == p)) {
+                         (board[i - 1][j - 1].col_of_figure == 'e' or
+                          Point(i - 1, j - 1) == p)) {
                 answer.push_back(Point(i, j));
               } else {
                 break;
@@ -234,7 +211,8 @@ struct Board {
                 answer.push_back(x);
               } else if (board[i][j].col_of_figure !=
                              board[p.x][p.y].col_of_figure &&
-                         (board[i + 1][j - 1].col_of_figure == 'e' or Point(i + 1, j - 1) == p)) {
+                         (board[i + 1][j - 1].col_of_figure == 'e' or
+                          Point(i + 1, j - 1) == p)) {
                 answer.push_back(Point(i, j));
               } else {
                 break;
@@ -247,7 +225,8 @@ struct Board {
                 answer.push_back(x);
               } else if (board[i][j].col_of_figure !=
                              board[p.x][p.y].col_of_figure &&
-                         (board[i - 1][j + 1].col_of_figure == 'e' or Point(i - 1, j + 1) == p)) {
+                         (board[i - 1][j + 1].col_of_figure == 'e' or
+                          Point(i - 1, j + 1) == p)) {
                 answer.push_back(Point(i, j));
               } else {
                 break;
@@ -264,7 +243,8 @@ struct Board {
                 answer.push_back(Point(p.x, i));
               } else if (board[p.x][i].col_of_figure !=
                              board[p.x][p.y].col_of_figure &&
-                         (board[p.x][i + 1].col_of_figure == 'e' or i + 1 == p.y)) {
+                         (board[p.x][i + 1].col_of_figure == 'e' or
+                          i + 1 == p.y)) {
                 answer.push_back(Point(p.x, i));
                 break;
               } else {
@@ -276,14 +256,15 @@ struct Board {
           if (p.y < x.y) {
             for (int i = p.y + 1; i <= x.y; ++i) {
               if (board[p.x][i].col_of_figure == 'e') {
-                answer.push_back(Point(p.x,i));
+                answer.push_back(Point(p.x, i));
               } else if (board[p.x][i].col_of_figure !=
                              board[p.x][p.y].col_of_figure &&
-                         (board[p.x][i - 1].col_of_figure == 'e' or i - 1 == p.y)) {
-                answer.push_back(Point(p.x,i));
+                         (board[p.x][i - 1].col_of_figure == 'e' or
+                          i - 1 == p.y)) {
+                answer.push_back(Point(p.x, i));
                 break;
               } else if (board[p.x][i].col_of_figure ==
-                             board[p.x][p.y].col_of_figure) {
+                         board[p.x][p.y].col_of_figure) {
                 break;
               }
             }
@@ -297,11 +278,12 @@ struct Board {
                 answer.push_back(Point(i, p.y));
               } else if (board[i][p.y].col_of_figure !=
                              board[p.x][p.y].col_of_figure &&
-                         (board[i + 1][p.y].col_of_figure == 'e' or i + 1 == p.x)) {
+                         (board[i + 1][p.y].col_of_figure == 'e' or
+                          i + 1 == p.x)) {
                 answer.push_back(Point(i, p.y));
                 break;
               } else if (board[i][p.y].col_of_figure ==
-                             board[p.x][p.y].col_of_figure) {
+                         board[p.x][p.y].col_of_figure) {
                 break;
               }
             }
@@ -312,7 +294,8 @@ struct Board {
                 answer.push_back(Point(i, p.y));
               } else if (board[i][p.y].col_of_figure !=
                              board[p.x][p.y].col_of_figure &&
-                         (board[i - 1][p.y].col_of_figure == 'e' or i - 1 == p.x)) {
+                         (board[i - 1][p.y].col_of_figure == 'e' or
+                          i - 1 == p.x)) {
                 answer.push_back(Point(i, p.y));
                 break;
               } else {
@@ -349,9 +332,11 @@ struct Board {
       }
       for (auto x : board[p.x][p.y].f->threat(p)) {
         // std::cout << x.x << ' ' << x.y << "\n";
-        if (board[p.x][p.y].col_of_figure == 'w' && board[x.x][x.y].col_of_figure == 'b' and x.y > p.y) {
+        if (board[p.x][p.y].col_of_figure == 'w' &&
+            board[x.x][x.y].col_of_figure == 'b' and x.y > p.y) {
           answer.push_back(x);
-        } else if (board[p.x][p.y].col_of_figure == 'b' && board[x.x][x.y].col_of_figure == 'w' and x.y < p.y) {
+        } else if (board[p.x][p.y].col_of_figure == 'b' &&
+                   board[x.x][x.y].col_of_figure == 'w' and x.y < p.y) {
           answer.push_back(x);
         }
       }
@@ -385,6 +370,7 @@ struct Board {
 
   void StartPosition() {
     Clear();
+    history.clear();
     current_move = 'w';
     for (int i = 0; i < 8; ++i) {
       for (int j = 0; j < 8; ++j) {
@@ -457,8 +443,8 @@ struct Board {
   }
 
   void Print() {
-    //std::cout << "\x1B[2J\x1B[H";
-    system("cls");
+    // std::cout << "\x1B[2J\x1B[H";
+    system("clear");
     char picture[26][26];
     bool color[26][26];
     for (int i = 0; i < 26; ++i) {
@@ -495,22 +481,25 @@ struct Board {
     for (int i = 0; i < 26; ++i) {
       for (int j = 0; j < 26; ++j) {
         char ch = picture[j][25 - i];
-
-        if (ch == 'N' or ch == 'B' or ch == 'R' or ch == 'Q' or ch == 'K' or ch == 'P') {
-          if (color[j][25 - i]) std::cout << "\x1b[33m" << ch  << "\x1b[0m" << "  ";
-          else std::cout << "\x1b[34m" << ch  << "\x1b[0m" << "  ";
-        } else if (ch != ' ' and ch != '#') {
-          std::cout << "\x1b[31m" << ch << "\x1b[0m" << "  ";
-        } else { std::cout << ch << "  ";}
-
-        //std::cout << ch << "  ";
+        /*
+        if (ch == 'N' or ch == 'B' or ch == 'R' or ch == 'Q' or ch == 'K' or ch
+        == 'P') { if (color[j][25 - i]) std::cout << "\x1b[33m" << ch  <<
+        "\x1b[0m" << "  "; else std::cout << "\x1b[34m" << ch  << "\x1b[0m" << "
+        "; } else if (ch != ' ' and ch != '#') { std::cout << "\x1b[31m" << ch
+        << "\x1b[0m" << "  "; } else { std::cout << ch << "  ";}
+        */
+        std::cout << ch << "  ";
       }
       std::cout << "\n";
     }
   }
 
   bool Is_possible(char name, Point first, Point second) {
-    if (board[first.x][first.y].f == nullptr or board[first.x][first.y].f->name != name or first == second) {
+    if (board[first.x][first.y].f == nullptr or
+        board[first.x][first.y].f->name != name or first == second) {
+      return false;
+    }
+    if (board[first.x][first.y].col_of_figure != current_move) {
       return false;
     }
     bool flag = false;
@@ -549,45 +538,60 @@ struct Board {
       exit(0);
       return false;
     }
+    if (move == "/history" or move == "/h") {
+      std::cout << (history.size() == 0 ? "No moves yet" : "History:") << "\n";
+      for (int i = 1; i < history.size(); i += 2) {
+        std::cout << (i + 1) / 2 << ". " << history[i - 1] << " " << history[i]
+                  << "\n";
+      }
+      if (history.size() % 2 == 1) {
+        std::cout << (history.size() + 1) / 2 << ". " << history.back() << "\n";
+      }
+      std::cout << "\nMake your move: \n";
+      std::getline(std::cin, move);
+      return Make_move(move);
+    }
     if (move == "0-0-0") {
       if (current_move == 'w') {
         if (move_number[0] != 0 or move_number[2] != 0)
           return false;
-        if (board[0][1].col_of_figure != 'e' or
-            board[0][2].col_of_figure != 'e' or
-            board[0][3].col_of_figure != 'e')
+        if (board[1][0].col_of_figure != 'e' or
+            board[2][0].col_of_figure != 'e' or
+            board[3][0].col_of_figure != 'e')
           return false;
-        if (black_threat[0][2] or black_threat[0][3] or black_threat[0][4])
+        if (black_threat[2][0] or black_threat[3][0] or black_threat[4][0])
           return false;
         move_number[0] = 1;
         move_number[2] = 1;
-        board[0][2] = board[0][4];
-        board[0][4].f = nullptr;
-        board[0][4].col_of_figure = 'e';
-        board[0][3].f = board[0][0].f;
-        board[0][3].col_of_figure = 'w';
+        board[2][0] = board[4][0];
+        board[4][0].f = nullptr;
+        board[4][0].col_of_figure = 'e';
+        board[3][0].f = board[0][0].f;
+        board[3][0].col_of_figure = 'w';
         board[0][0].f = nullptr;
         board[0][0].col_of_figure = 'e';
+        history.push_back("0-0-0");
         return true;
       }
       if (current_move == 'b') {
         if (move_number[1] != 0 or move_number[4] != 0)
           return false;
-        if (board[7][1].col_of_figure != 'e' or
-            board[7][2].col_of_figure != 'e' or
-            board[7][3].col_of_figure != 'e')
+        if (board[1][7].col_of_figure != 'e' or
+            board[2][7].col_of_figure != 'e' or
+            board[3][7].col_of_figure != 'e')
           return false;
-        if (white_threat[7][2] or white_threat[7][3] or white_threat[7][4])
+        if (white_threat[2][7] or white_threat[3][7] or white_threat[4][7])
           return false;
         move_number[1] = 1;
         move_number[4] = 1;
-        board[7][2] = board[7][4];
-        board[7][4].f = nullptr;
-        board[7][4].col_of_figure = 'e';
-        board[7][3].f = board[7][0].f;
-        board[7][3].col_of_figure = 'b';
-        board[7][0].f = nullptr;
-        board[7][0].col_of_figure = 'e';
+        board[2][7] = board[4][7];
+        board[4][7].f = nullptr;
+        board[4][7].col_of_figure = 'e';
+        board[3][7].f = board[0][7].f;
+        board[3][7].col_of_figure = 'b';
+        board[0][7].f = nullptr;
+        board[0][7].col_of_figure = 'e';
+        history.push_back("0-0-0");
         return true;
       }
     }
@@ -595,42 +599,45 @@ struct Board {
       if (current_move == 'w') {
         if (move_number[0] != 0 or move_number[3] != 0)
           return false;
-        if (board[0][5].col_of_figure != 'e' or
-            board[0][6].col_of_figure != 'e')
+        if (board[5][0].col_of_figure != 'e' or
+            board[6][0].col_of_figure != 'e')
           return false;
-        if (black_threat[0][4] or black_threat[0][5] or black_threat[0][6])
+        if (black_threat[4][0] or black_threat[5][0] or black_threat[6][0])
           return false;
         move_number[0] = 1;
         move_number[3] = 1;
-        board[0][6] = board[0][4];
-        board[0][4].f = nullptr;
-        board[0][4].col_of_figure = 'e';
-        board[0][5].f = board[0][7].f;
-        board[0][5].col_of_figure = 'w';
-        board[0][7].f = nullptr;
-        board[0][7].col_of_figure = 'e';
+        board[6][0] = board[4][0];
+        board[4][0].f = nullptr;
+        board[4][0].col_of_figure = 'e';
+        board[5][0].f = board[7][0].f;
+        board[5][0].col_of_figure = 'w';
+        board[7][0].f = nullptr;
+        board[7][0].col_of_figure = 'e';
+        history.push_back("0-0");
         return true;
       }
       if (current_move == 'b') {
         if (move_number[1] != 0 or move_number[5] != 0)
           return false;
-        if (board[7][5].col_of_figure != 'e' or
-            board[7][6].col_of_figure != 'e')
+        if (board[5][7].col_of_figure != 'e' or
+            board[6][7].col_of_figure != 'e')
           return false;
-        if (white_threat[7][4] or white_threat[7][5] or white_threat[7][6])
+        if (white_threat[4][7] or white_threat[5][7] or white_threat[6][7])
           return false;
         move_number[1] = 1;
         move_number[5] = 1;
-        board[7][6] = board[7][4];
-        board[7][4].f = nullptr;
-        board[7][4].col_of_figure = 'e';
-        board[7][5].f = board[7][7].f;
-        board[7][5].col_of_figure = 'b';
+        board[6][7] = board[4][7];
+        board[4][7].f = nullptr;
+        board[4][7].col_of_figure = 'e';
+        board[5][7].f = board[7][7].f;
+        board[5][7].col_of_figure = 'b';
         board[7][7].f = nullptr;
         board[7][7].col_of_figure = 'e';
+        history.push_back("0-0");
         return true;
       }
     }
+
     if (move.size() != 6)
       return false;
     if (move[3] != '-' and move[3] != 'x' and move[3] != ' ')
@@ -646,7 +653,21 @@ struct Board {
     char name = move[0];
     Point first(move[1] - 'a', move[2] - '1');
     Point second(move[4] - 'a', move[5] - '1');
+
     if (Is_possible(name, first, second)) {
+      if (first.x == 0 && first.y == 0) {
+        move_number[2] = 1;
+      } else if (first.x == 7 && first.y == 0) {
+        move_number[3] = 1;
+      } else if (first.x == 0 && first.y == 7) {
+        move_number[4] = 1;
+      } else if (first.x == 7 && first.y == 7) {
+        move_number[5] = 1;
+      } else if (first.x == 4 && first.y == 0) {
+        move_number[0] = 1;
+      } else if (first.x == 4 && first.y == 7) {
+        move_number[1] = 1;
+      }
       if (board[second.x][second.y].f != nullptr) {
         delete board[second.x][second.y].f;
         board[second.x][second.y].f = nullptr;
@@ -657,6 +678,8 @@ struct Board {
           board[first.x][first.y].col_of_figure;
       board[first.x][first.y].f = nullptr;
       board[first.x][first.y].col_of_figure = 'e';
+      move[3] = '-';
+      history.push_back(move);
       return true;
     }
     return false;

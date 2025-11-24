@@ -1,0 +1,17 @@
+file="$1"
+if [[ -z "$file" ]]; then
+    echo "Использование: ./run <файл.cpp>"
+    exit 1
+fi
+
+# Форматируем код
+echo "=== Форматирование кода ==="
+clang-format -i "$file" 2>/dev/null || echo "clang-format не найден или не настроен"
+
+# Проверяем стиль кода с clang-tidy
+#echo "=== Проверка стиля кода ==="
+#clang-tidy --config-file=clang-tidy_cpp.json "$file" 2>/dev/null || echo "clang-tidy не найден или не настроен"
+
+# Компилируем и запускаем
+echo "=== Компиляция и запуск ==="
+g++ -std=c++20 -fsanitize=address -o "${file%.cpp}" "$file" && ./"${file%.cpp}"

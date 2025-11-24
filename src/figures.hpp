@@ -5,6 +5,7 @@ struct BaseFigure {
   char name;
   virtual std::vector<Point> threat(const Point &p) = 0;
   virtual std::vector<Point> ach(const Point &p, char col) { return threat(p); }
+  virtual ~BaseFigure() = default;
 };
 
 struct Knight : BaseFigure {
