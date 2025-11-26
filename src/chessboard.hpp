@@ -21,7 +21,6 @@ struct Board {
   std::vector<std::string> history;
 
   std::vector<Point> dostig(Point p, bool mode) const;
-  std::vector<Point> Self_def(Point p) const;
 
   void StartPosition() {
     Clear();
