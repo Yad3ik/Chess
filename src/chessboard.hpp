@@ -2,16 +2,7 @@
 #include <iostream>
 #include <string>
 
-
-bool Find(std::vector<Point> f, Point p) {
-  for (auto x : f) {
-    if (x == p) {
-      return true;
-    }
-  }
-  return false;
-}
-
+bool Find(std::vector<Point> vec, Point p);
 
 struct Field {
   char col_of_field;
@@ -27,709 +18,30 @@ struct Board {
   // 0 - white king, 1 - black king, 2 - white left rook, 3 - white right rook,
   // 4 - black left rook, 5 - black right rook
   int move_number[6];
+  std::vector<std::string> history;
 
-  std::vector<Point> dostig(BaseFigure *f, Point p) {
-    char this_name = board[p.x][p.y].f->name;
-    std::vector<Point> answer;
-
-    if (this_name == 'N') {
-      for (auto x : board[p.x][p.y].f->ach(p, board[p.x][p.y].col_of_figure)) {
-        if (board[x.x][x.y].col_of_figure != board[p.x][p.y].col_of_figure) {
-          answer.push_back(x);
-        }
-      }
-    }
-
-    if (this_name == 'R') {
-      for (auto x : board[p.x][p.y].f->ach(p, board[p.x][p.y].col_of_figure)) {
-        if (p.x == x.x) {
-          if (p.y > x.y) {
-            for (int i = p.y - 1; i >= x.y; --i) {
-              if (board[p.x][i].col_of_figure == 'e') {
-                answer.push_back(Point(p.x, i));
-              } else if (board[p.x][i].col_of_figure !=
-                             board[p.x][p.y].col_of_figure &&
-                         (board[p.x][i + 1].col_of_figure == 'e' or i + 1 == p.y)) {
-                answer.push_back(Point(p.x, i));
-                break;
-              } else {
-                break;
-              }
-            }
-          }
-
-          if (p.y < x.y) {
-            for (int i = p.y + 1; i <= x.y; ++i) {
-              if (board[p.x][i].col_of_figure == 'e') {
-                answer.push_back(Point(p.x,i));
-              } else if (board[p.x][i].col_of_figure !=
-                             board[p.x][p.y].col_of_figure &&
-                         (board[p.x][i - 1].col_of_figure == 'e' or i - 1 == p.y)) {
-                answer.push_back(Point(p.x,i));
-                break;
-              } else if (board[p.x][i].col_of_figure ==
-                             board[p.x][p.y].col_of_figure) {
-                break;
-              }
-            }
-          }
-        }
-
-        if (p.y == x.y) {
-          if (p.x > x.x) {
-            for (int i = p.x - 1; i >= x.x; --i) {
-              if (board[i][p.y].col_of_figure == 'e') {
-                answer.push_back(Point(i, p.y));
-              } else if (board[i][p.y].col_of_figure !=
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i + 1][p.y].col_of_figure == 'e' or i + 1 == p.x)) {
-                answer.push_back(Point(i, p.y));
-                break;
-              } else if (board[i][p.y].col_of_figure ==
-                             board[p.x][p.y].col_of_figure) {
-                break;
-              }
-            }
-          }
-          if (p.x < x.x) {
-            for (int i = p.x + 1; i <= x.x; ++i) {
-              if (board[i][p.y].col_of_figure == 'e') {
-                answer.push_back(Point(i, p.y));
-              } else if (board[i][p.y].col_of_figure !=
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i - 1][p.y].col_of_figure == 'e' or i - 1 == p.x)) {
-                answer.push_back(Point(i, p.y));
-                break;
-              } else {
-                break;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    if (this_name == 'B') {
-      for (auto x : board[p.x][p.y].f->ach(p, board[p.x][p.y].col_of_figure)) {
-        if ((p.x - x.x) == (p.y - x.y)) {
-          if (p.y > x.y) {
-            for (int i = p.x - 1, j = p.y - 1; i >= x.x; --i, --j) {
-              if (board[i][j].col_of_figure == 'e') {
-                answer.push_back(Point(i, j));
-              } else if (board[i][j].col_of_figure !=
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i + 1][j + 1].col_of_figure == 'e' or Point(i + 1, j + 1) == p)) {
-                answer.push_back(Point(i, j));
-                break;
-              } else {
-                break;
-              }
-            }
-          }
-
-          if (p.y < x.y) {
-            for (int i = p.x + 1, j = p.y + 1; i <= x.x; ++i, ++j) {
-              if (board[i][j].col_of_figure == 'e') {
-                answer.push_back(Point(i, j));
-              } else if (board[i][j].col_of_figure !=
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i - 1][j - 1].col_of_figure == 'e' or Point(i - 1, j - 1) == p)) {
-                answer.push_back(Point(i, j));
-                break;
-              } else {
-                break;
-              }
-            }
-          }
-        }
-
-        if ((p.x - x.x) == -(p.y - x.y)) {
-          if (p.x > x.x) {
-            for (int i = p.x - 1, j = p.y + 1; i >= x.x; --i, ++j) {
-              if (board[i][j].col_of_figure == 'e') {
-                answer.push_back(Point(i, j));
-              } else if (board[i][j].col_of_figure !=
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i + 1][j - 1].col_of_figure == 'e' or Point(i + 1, j - 1) == p)) {
-                answer.push_back(Point(i, j));
-                break;
-              } else {
-                break;
-              }
-            }
-          }
-          if (p.x < x.x) {
-            for (int i = p.x + 1, j = p.y - 1; i <= x.x; ++i, --j) {
-              if (board[i][j].col_of_figure == 'e') {
-                answer.push_back(Point(i, j));
-              } else if (board[i][j].col_of_figure !=
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i - 1][j + 1].col_of_figure == 'e' or Point(i - 1, j + 1) == p)) {
-                answer.push_back(Point(i, j));
-                break;
-              } else {
-                break;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    if (this_name == 'Q') {
-      for (auto x : board[p.x][p.y].f->ach(p, board[p.x][p.y].col_of_figure)) {
-        if ((p.x - x.x) == (p.y - x.y)) {
-          if (p.y > x.y) {
-            for (int i = p.x - 1, j = p.y - 1; i >= x.x; --i, --j) {
-              if (board[i][j].col_of_figure == 'e') {
-                answer.push_back(Point(i, j));
-              } else if (board[i][j].col_of_figure !=
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i + 1][j + 1].col_of_figure == 'e' or Point(i + 1, j + 1) == p)) {
-                answer.push_back(Point(i, j));
-                break;
-              } else {
-                break;
-              }
-            }
-          }
-
-          if (p.y < x.y) {
-            for (int i = p.x + 1, j = p.y + 1; i <= x.x; ++i, ++j) {
-              if (board[i][j].col_of_figure == 'e') {
-                answer.push_back(Point(i, j));
-              } else if (board[i][j].col_of_figure !=
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i - 1][j - 1].col_of_figure == 'e' or Point(i - 1, j - 1) == p)) {
-                answer.push_back(Point(i, j));
-                break;
-              } else {
-                break;
-              }
-            }
-          }
-        }
-
-        if ((p.x - x.x) == -(p.y - x.y)) {
-          if (p.x > x.x) {
-            for (int i = p.x - 1, j = p.y + 1; i >= x.x; --i, ++j) {
-              if (board[i][j].col_of_figure == 'e') {
-                answer.push_back(Point(i, j));
-              } else if (board[i][j].col_of_figure !=
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i + 1][j - 1].col_of_figure == 'e' or Point(i + 1, j - 1) == p)) {
-                answer.push_back(Point(i, j));
-                break;
-              } else {
-                break;
-              }
-            }
-          }
-          if (p.x < x.x) {
-            for (int i = p.x + 1, j = p.y - 1; i <= x.x; ++i, --j) {
-              if (board[i][j].col_of_figure == 'e') {
-                answer.push_back(Point(i, j));
-              } else if (board[i][j].col_of_figure !=
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i - 1][j + 1].col_of_figure == 'e' or Point(i - 1, j + 1) == p)) {
-                answer.push_back(Point(i, j));
-                break;
-              } else {
-                break;
-              }
-            }
-          }
-        }
-      }
-      for (auto x : board[p.x][p.y].f->ach(p, board[p.x][p.y].col_of_figure)) {
-        if (p.x == x.x) {
-          if (p.y > x.y) {
-            for (int i = p.y - 1; i >= x.y; --i) {
-              if (board[p.x][i].col_of_figure == 'e') {
-                answer.push_back(Point(p.x, i));
-              } else if (board[p.x][i].col_of_figure !=
-                             board[p.x][p.y].col_of_figure &&
-                         (board[p.x][i + 1].col_of_figure == 'e' or i + 1 == p.y)) {
-                answer.push_back(Point(p.x, i));
-                break;
-              } else {
-                break;
-              }
-            }
-          }
-
-          if (p.y < x.y) {
-            for (int i = p.y + 1; i <= x.y; ++i) {
-              if (board[p.x][i].col_of_figure == 'e') {
-                answer.push_back(Point(p.x,i));
-              } else if (board[p.x][i].col_of_figure !=
-                             board[p.x][p.y].col_of_figure &&
-                         (board[p.x][i - 1].col_of_figure == 'e' or i - 1 == p.y)) {
-                answer.push_back(Point(p.x,i));
-                break;
-              } else if (board[p.x][i].col_of_figure ==
-                             board[p.x][p.y].col_of_figure) {
-                break;
-              }
-            }
-          }
-        }
-
-        if (p.y == x.y) {
-          if (p.x > x.x) {
-            for (int i = p.x - 1; i >= x.x; --i) {
-              if (board[i][p.y].col_of_figure == 'e') {
-                answer.push_back(Point(i, p.y));
-              } else if (board[i][p.y].col_of_figure !=
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i + 1][p.y].col_of_figure == 'e' or i + 1 == p.x)) {
-                answer.push_back(Point(i, p.y));
-                break;
-              } else if (board[i][p.y].col_of_figure ==
-                             board[p.x][p.y].col_of_figure) {
-                break;
-              }
-            }
-          }
-          if (p.x < x.x) {
-            for (int i = p.x + 1; i <= x.x; ++i) {
-              if (board[i][p.y].col_of_figure == 'e') {
-                answer.push_back(Point(i, p.y));
-              } else if (board[i][p.y].col_of_figure !=
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i - 1][p.y].col_of_figure == 'e' or i - 1 == p.x)) {
-                answer.push_back(Point(i, p.y));
-                break;
-              } else {
-                break;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    if (this_name == 'P') {
-      if (board[p.x][p.y].col_of_figure == 'w') {
-        if (board[p.x][p.y + 1].col_of_figure == 'e') {
-          answer.push_back(Point(p.x, p.y + 1));
-        }
-        if (p.y == 1) {
-          if (board[p.x][p.y + 1].col_of_figure == 'e' and
-              board[p.x][p.y + 2].col_of_figure == 'e') {
-            answer.push_back(Point(p.x, p.y + 2));
-          }
-        }
-      }
-      if (board[p.x][p.y].col_of_figure == 'b') {
-        if (board[p.x][p.y - 1].col_of_figure == 'e') {
-          answer.push_back(Point(p.x, p.y - 1));
-        }
-        if (p.y == 6) {
-          if (board[p.x][p.y - 1].col_of_figure == 'e' and
-              board[p.x][p.y - 2].col_of_figure == 'e') {
-            answer.push_back(Point(p.x, p.y - 2));
-          }
-        }
-      }
-      for (auto x : board[p.x][p.y].f->threat(p)) {
-        // std::cout << x.x << ' ' << x.y << "\n";
-        if (board[p.x][p.y].col_of_figure == 'w' && board[x.x][x.y].col_of_figure == 'b' and x.y > p.y) {
-          answer.push_back(x);
-        } else if (board[p.x][p.y].col_of_figure == 'b' && board[x.x][x.y].col_of_figure == 'w' and x.y < p.y) {
-          answer.push_back(x);
-        }
-      }
-    }
-
-    if (this_name == 'K') {
-      for (auto x : board[p.x][p.y].f->threat(p)) {
-        if (board[p.x][p.y].col_of_figure == 'w') {
-          if (board[x.x][x.y].col_of_figure != board[p.x][p.y].col_of_figure and
-              black_threat[x.x][x.y] == false) {
-            answer.push_back(x);
-          }
-        }
-        if (board[p.x][p.y].col_of_figure == 'b') {
-          if (board[x.x][x.y].col_of_figure != board[p.x][p.y].col_of_figure and
-              white_threat[x.x][x.y] == false) {
-            answer.push_back(x);
-          }
-        }
-      }
-    }
-
-    for (auto &x : answer) {
-      if (x == p) {
-        std::swap(x, answer[answer.size() - 1]);
-        answer.pop_back();
-      }
-    }
-    return answer;
-  }
-
-
-  std::vector<Point> Self_def(Point p) {
-    char this_name = board[p.x][p.y].f->name;
-    std::vector<Point> answer;
-
-    if (this_name == 'N') {
-      for (auto x : board[p.x][p.y].f->ach(p, board[p.x][p.y].col_of_figure)) {
-        if (board[x.x][x.y].col_of_figure == board[p.x][p.y].col_of_figure) {
-          answer.push_back(x);
-        }
-      }
-    }
-
-    if (this_name == 'R') {
-      for (auto x : board[p.x][p.y].f->ach(p, board[p.x][p.y].col_of_figure)) {
-        if (p.x == x.x) {
-          if (p.y > x.y) {
-            for (int i = p.y - 1; i >= x.y; --i) {
-              if (board[p.x][i].col_of_figure == 'e') {
-                //ничего не делаем
-              } else if (board[p.x][i].col_of_figure ==
-                             board[p.x][p.y].col_of_figure &&
-                         (board[p.x][i + 1].col_of_figure == 'e' or i + 1 == p.y)) {
-                answer.push_back(Point(p.x, i));
-                break;
-              } else {
-                break;
-              }
-            }
-          }
-
-          if (p.y < x.y) {
-            for (int i = p.y + 1; i <= x.y; ++i) {
-              if (board[p.x][i].col_of_figure == 'e') {
-                continue;
-              }
-              if (board[p.x][i].col_of_figure ==
-                             board[p.x][p.y].col_of_figure &&
-                         (board[p.x][i - 1].col_of_figure == 'e' or i - 1 == p.y)) {
-                answer.push_back(Point(p.x,i));
-                break;
-              }
-              if (board[p.x][i].col_of_figure !=
-                             board[p.x][p.y].col_of_figure) {
-                break;
-              }
-            }
-          }
-        }
-
-        if (p.y == x.y) {
-          if (p.x > x.x) {
-            for (int i = p.x - 1; i >= x.x; --i) {
-              if (board[i][p.y].col_of_figure == 'e') {
-                continue;
-              }
-              if (board[i][p.y].col_of_figure ==
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i + 1][p.y].col_of_figure == 'e' or i + 1 == p.x)) {
-                answer.push_back(Point(i, p.y));
-                break;
-              }
-              if (board[i][p.y].col_of_figure !=
-                             board[p.x][p.y].col_of_figure) {
-                break;
-              }
-            }
-          }
-          if (p.x < x.x) {
-            for (int i = p.x + 1; i <= x.x; ++i) {
-              if (board[i][p.y].col_of_figure == 'e') {
-                continue;
-              }
-              if (board[i][p.y].col_of_figure ==
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i - 1][p.y].col_of_figure == 'e' or i - 1 == p.x)) {
-                answer.push_back(Point(i, p.y));
-                break;
-              }
-              if (board[i][p.y].col_of_figure !=
-               board[p.x][p.y].col_of_figure) {
-                break;
-               }
-            }
-          }
-        }
-      }
-    }
-
-    if (this_name == 'B') {
-      for (auto x : board[p.x][p.y].f->ach(p, board[p.x][p.y].col_of_figure)) {
-        if ((p.x - x.x) == (p.y - x.y)) {
-          if (p.y > x.y) {
-            for (int i = p.x - 1, j = p.y - 1; i >= x.x; --i, --j) {
-              if (board[i][j].col_of_figure == 'e') {
-                continue;
-              }
-              if (board[i][j].col_of_figure ==
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i + 1][j + 1].col_of_figure == 'e' or Point(i + 1, j + 1) == p)) {
-                answer.push_back(Point(i, j));
-                break;
-              }
-              if (board[i][j  ].col_of_figure !=
-               board[p.x][p.y].col_of_figure) {
-                break;
-               }
-            }
-          }
-
-          if (p.y < x.y) {
-            for (int i = p.x + 1, j = p.y + 1; i <= x.x; ++i, ++j) {
-              if (board[i][j].col_of_figure == 'e') {
-                continue;
-              }
-              if (board[i][j].col_of_figure ==
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i - 1][j - 1].col_of_figure == 'e' or Point(i - 1, j - 1) == p)) {
-                answer.push_back(Point(i, j));
-
-                break;
-              }
-              if (board[i][j].col_of_figure !=
-               board[p.x][p.y].col_of_figure) {
-                break;
-               }
-            }
-          }
-        }
-
-        if ((p.x - x.x) == -(p.y - x.y)) {
-          if (p.x > x.x) {
-            for (int i = p.x - 1, j = p.y + 1; i >= x.x; --i, ++j) {
-              if (board[i][j].col_of_figure == 'e') {
-                continue;
-              }
-              if (board[i][j].col_of_figure ==
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i + 1][j - 1].col_of_figure == 'e' or Point(i + 1, j - 1) == p)) {
-                answer.push_back(Point(i, j));
-                break;
-              }
-              if (board[i][j].col_of_figure !=
-               board[p.x][p.y].col_of_figure) {
-                break;
-               }
-            }
-          }
-          if (p.x < x.x) {
-            for (int i = p.x + 1, j = p.y - 1; i <= x.x; ++i, --j) {
-              if (board[i][j].col_of_figure == 'e') {
-                continue;
-              }
-              if (board[i][j].col_of_figure ==
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i - 1][j + 1].col_of_figure == 'e' or Point(i - 1, j + 1) == p)) {
-                answer.push_back(Point(i, j));
-                break;
-              }
-              if (board[i][j].col_of_figure !=
-               board[p.x][p.y].col_of_figure) {
-                break;
-               }
-            }
-          }
-        }
-      }
-    }
-
-    if (this_name == 'Q') {
-            for (auto x : board[p.x][p.y].f->ach(p, board[p.x][p.y].col_of_figure)) {
-        if ((p.x - x.x) == (p.y - x.y)) {
-          if (p.y > x.y) {
-            for (int i = p.x - 1, j = p.y - 1; i >= x.x; --i, --j) {
-              if (board[i][j].col_of_figure == 'e') {
-                continue;
-              }
-              if (board[i][j].col_of_figure ==
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i + 1][j + 1].col_of_figure == 'e' or Point(i + 1, j + 1) == p)) {
-                answer.push_back(Point(i, j));
-                break;
-              }
-              if (board[i][j].col_of_figure !=
-               board[p.x][p.y].col_of_figure) {
-                break;
-               }
-            }
-          }
-
-          if (p.y < x.y) {
-            for (int i = p.x + 1, j = p.y + 1; i <= x.x; ++i, ++j) {
-              if (board[i][j].col_of_figure == 'e') {
-                continue;
-              }
-              if (board[i][j].col_of_figure ==
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i - 1][j - 1].col_of_figure == 'e' or Point(i - 1, j - 1) == p)) {
-                answer.push_back(Point(i, j));
-                break;
-              }
-              if (board[i][j].col_of_figure !=
-               board[p.x][p.y].col_of_figure) {
-                break;
-               }
-            }
-          }
-        }
-
-        if ((p.x - x.x) == -(p.y - x.y)) {
-          if (p.x > x.x) {
-            for (int i = p.x - 1, j = p.y + 1; i >= x.x; --i, ++j) {
-              if (board[i][j].col_of_figure == 'e') {
-                continue;
-              }
-              if (board[i][j].col_of_figure ==
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i + 1][j - 1].col_of_figure == 'e' or Point(i + 1, j - 1) == p)) {
-                answer.push_back(Point(i, j));
-                break;
-              }
-              if (board[i][j].col_of_figure !=
-               board[p.x][p.y].col_of_figure) {
-                break;
-               }
-            }
-          }
-          if (p.x < x.x) {
-            for (int i = p.x + 1, j = p.y - 1; i <= x.x; ++i, --j) {
-              if (board[i][j].col_of_figure == 'e') {
-                continue;
-              }
-              if (board[i][j].col_of_figure ==
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i - 1][j + 1].col_of_figure == 'e' or Point(i - 1, j + 1) == p)) {
-                answer.push_back(Point(i, j));
-                break;
-
-              }
-              if (board[i][j].col_of_figure !=
-               board[p.x][p.y].col_of_figure) {
-                break;
-               }
-            }
-          }
-        }
-      }
-      for (auto x : board[p.x][p.y].f->ach(p, board[p.x][p.y].col_of_figure)) {
-        if (p.x == x.x) {
-          if (p.y > x.y) {
-            for (int i = p.y - 1; i >= x.y; --i) {
-              if (board[p.x][i].col_of_figure == 'e') {
-                //ничего не делаем
-              } else if (board[p.x][i].col_of_figure ==
-                             board[p.x][p.y].col_of_figure &&
-                         (board[p.x][i + 1].col_of_figure == 'e' or i + 1 == p.y)) {
-                answer.push_back(Point(p.x, i));
-                break;
-              } else {
-                break;
-              }
-            }
-          }
-
-          if (p.y < x.y) {
-            for (int i = p.y + 1; i <= x.y; ++i) {
-              if (board[p.x][i].col_of_figure == 'e') {
-                continue;
-              }
-              if (board[p.x][i].col_of_figure ==
-                             board[p.x][p.y].col_of_figure &&
-                         (board[p.x][i - 1].col_of_figure == 'e' or i - 1 == p.y)) {
-                answer.push_back(Point(p.x,i));
-                break;
-              }
-              if (board[p.x][i].col_of_figure !=
-                             board[p.x][p.y].col_of_figure) {
-                break;
-              }
-            }
-          }
-        }
-
-        if (p.y == x.y) {
-          if (p.x > x.x) {
-            for (int i = p.x - 1; i >= x.x; --i) {
-              if (board[i][p.y].col_of_figure == 'e') {
-                continue;
-              }
-              if (board[i][p.y].col_of_figure ==
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i + 1][p.y].col_of_figure == 'e' or i + 1 == p.x)) {
-                answer.push_back(Point(i, p.y));
-                break;
-              }
-              if (board[i][p.y].col_of_figure !=
-                             board[p.x][p.y].col_of_figure) {
-                break;
-              }
-            }
-          }
-          if (p.x < x.x) {
-            for (int i = p.x + 1; i <= x.x; ++i) {
-              if (board[i][p.y].col_of_figure == 'e') {
-                continue;
-              }
-              if (board[i][p.y].col_of_figure ==
-                             board[p.x][p.y].col_of_figure &&
-                         (board[i - 1][p.y].col_of_figure == 'e' or i - 1 == p.x)) {
-                answer.push_back(Point(i, p.y));
-                break;
-              }
-              if (board[i][p.y].col_of_figure !=
-               board[p.x][p.y].col_of_figure) {
-                break;
-               }
-            }
-          }
-        }
-      }
-    }
-
-    return answer;
-  }
-
-
-  void Obnova(Board& b) {
-    for (int i = 0; i < 8; ++i) {
-      for (int j = 0; j < 8; ++j) {
-        if (Find(b.bit_field('w'), Point(i , j))) {
-          b.white_threat[i][j] = true;
-        } else {
-          b.white_threat[i][j] = false;
-        }
-        if (Find(b.bit_field('b'), Point(i , j))) {
-          b.black_threat[i][j] = true;
-        } else {
-          b.black_threat[i][j] = false;
-        }
-      }
-    }
-  }
+  std::vector<Point> dostig(Point p, bool mode) const;
+  std::vector<Point> Self_def(Point p) const;
 
   void StartPosition() {
     Clear();
     current_move = 'w';
     for (int i = 0; i < 8; ++i) {
       for (int j = 0; j < 8; ++j) {
-        if (j == 1 or j == 6) {
+        if (j == 1 || j == 6) {
           board[i][j].f = new Pawn;
           board[i][j].f->name = 'P';
         }
-        if (j == 0 or j == 7) {
-          if (i == 0 or i == 7) {
+        if (j == 0 || j == 7) {
+          if (i == 0 || i == 7) {
             board[i][j].f = new Rook;
             board[i][j].f->name = 'R';
           }
-          if (i == 1 or i == 6) {
+          if (i == 1 || i == 6) {
             board[i][j].f = new Knight;
             board[i][j].f->name = 'N';
           }
-          if (i == 2 or i == 5) {
+          if (i == 2 || i == 5) {
             board[i][j].f = new Bishop;
             board[i][j].f->name = 'B';
           }
@@ -784,19 +96,19 @@ struct Board {
   }
 
   void Print() {
-    //std::cout << "\x1B[2J\x1B[H";
-
+    // std::cout << "\x1B[2J\x1B[H";
+    system("clear");
     char picture[26][26];
     bool color[26][26];
     for (int i = 0; i < 26; ++i) {
       for (int j = 0; j < 26; ++j) {
-        if (i == 0 or i == 25) {
+        if (i == 0 || i == 25) {
           picture[i][j] = '*';
         }
-        if (j == 0 or j == 25) {
+        if (j == 0 || j == 25) {
           picture[i][j] = '*';
         }
-        if ((i == 0 or i == 25) and (j == 0 or j == 25)) {
+        if ((i == 0 || i == 25) && (j == 0 || j == 25)) {
           picture[i][j] = '*';
         }
       }
@@ -822,32 +134,14 @@ struct Board {
     for (int i = 0; i < 26; ++i) {
       for (int j = 0; j < 26; ++j) {
         char ch = picture[j][25 - i];
-
-        if (ch == 'N' or ch == 'B' or ch == 'R' or ch == 'Q' or ch == 'K' or ch == 'P') {
-          if (color[j][25 - i]) std::cout << "\x1b[33m" << ch  << "\x1b[0m" << "  ";
-          else std::cout << "\x1b[34m" << ch  << "\x1b[0m" << "  ";
-        } else if (ch != ' ' and ch != '#') {
-          std::cout << "\x1b[31m" << ch << "\x1b[0m" << "  ";
-        } else { std::cout << ch << "  ";}
-
-        //std::cout << ch << "  ";
-      }
-      std::cout << "\n";
-    }
-  }
-
-  void PrintB() {
-    std::cout << "\n";
-    for (int i = 0; i < 8; ++i) {
-      for (int j = 0; j < 8; ++j) {
-        std::cout << white_threat[j][7 - i] << " ";
-      }
-      std::cout << "\n";
-    }
-    std::cout << "\n";
-    for (int i = 0; i < 8; ++i) {
-      for (int j = 0; j < 8; ++j) {
-        std::cout << black_threat[j][7 - i] << " ";
+        /*
+        if (ch == 'N' || ch == 'B' || ch == 'R' || ch == 'Q' || ch == 'K' || ch
+        == 'P') { if (color[j][25 - i]) std::cout << "\x1b[33m" << ch  <<
+        "\x1b[0m" << "  "; else std::cout << "\x1b[34m" << ch  << "\x1b[0m" << "
+        "; } else if (ch != ' ' && ch != '#') { std::cout << "\x1b[31m" << ch <<
+        "\x1b[0m" << "  "; } else { std::cout << ch << "  ";}
+        */
+        std::cout << ch << "  ";
       }
       std::cout << "\n";
     }
@@ -857,223 +151,262 @@ struct Board {
     std::vector<Point> bit;
     for (int i = 0; i < 8; ++i) {
       for (int j = 0; j < 8; ++j) {
-        if (board[i][j].col_of_figure == color && board[i][j].f->name != 'K' && board[i][j].f->name != 'P') {
-          for (auto x : dostig(board[i][j].f, Point(i, j))) {
+        if (board[i][j].col_of_figure == color && board[i][j].f->name != 'K' &&
+            board[i][j].f->name != 'P') {
+          for (auto x : dostig(Point(i, j), false)) {
             bit.push_back(x);
           }
-          for (auto x : Self_def(Point(i, j))) {
+          for (auto x : dostig(Point(i, j), true)) {
             bit.push_back(x);
           }
-        } else if (board[i][j].col_of_figure == color && board[i][j].f->name == 'K') {
-          for (auto x : board[i][j].f->ach(Point(i , j), color)) {
+        } else if (board[i][j].col_of_figure == color &&
+                   board[i][j].f->name == 'K') {
+          for (auto x : board[i][j].f->ach(Point(i, j), color)) {
             bit.push_back(x);
           }
-          for (auto x : Self_def(Point(i, j))) {
+          for (auto x : dostig(Point(i, j), true)) {
             bit.push_back(x);
           }
-        } else if (board[i][j].col_of_figure == color && board[i][j].f->name == 'P') {
-          for (auto x : board[i][j].f->threat(Point(i , j))) {
-            if (color == 'w' and x.y > j) {
+        } else if (board[i][j].col_of_figure == color &&
+                   board[i][j].f->name == 'P') {
+          for (auto x : board[i][j].f->threat(Point(i, j))) {
+            if (color == 'w' && x.y > j) {
               bit.push_back(x);
-            } else if (color == 'b' and x.y < j) {
+            } else if (color == 'b' && x.y < j) {
               bit.push_back(x);
             }
           }
         }
-
       }
     }
     return bit;
   }
 
-  bool Is_possible(char name, Point first, Point second) {
-    if (board[first.x][first.y].f == nullptr or board[first.x][first.y].f->name != name or first == second) {
-      return false;
-    }
-    bool flag = false;
-    auto a = board[first.x][first.y].f->ach(first, current_move);
-
-    for (auto x : (a)) {
-      if (second == x) {
-        flag = true;
-        break;
-      }
-    }
-    if (flag == false) {
-      return false;
-    }
-
-    auto achiev = dostig(board[first.x][first.y].f, first);
-    for (auto x : achiev) {
-      if (x == second and Premove(first, second)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-
-  bool Premove(Point first, Point second) {
-    Board copy = *this;
-    if (copy.board[second.x][second.y].f != nullptr) {
-      //delete copy.board[second.x][second.y].f;
-      copy.board[second.x][second.y].f = nullptr;
-      copy.board[second.x][second.y].col_of_figure = 'e';
-    }
-    copy.board[second.x][second.y].f = copy.board[first.x][first.y].f;
-    copy.board[second.x][second.y].col_of_figure =
-        copy.board[first.x][first.y].col_of_figure;
-    copy.board[first.x][first.y].f = nullptr;
-    copy.board[first.x][first.y].col_of_figure = 'e';
-    Obnova(copy);
-
-    for (int i = 0; i < 8; ++i) {
-      for (int j = 0; j < 8; ++j) {
-        if (current_move == 'w' and copy.board[i][j].col_of_figure == 'w' and copy.board[i][j].f->name == 'K' and copy.black_threat[i][j] == false) {
-          return true;
-        }
-        if (current_move == 'w' and copy.board[i][j].col_of_figure == 'w' and copy.board[i][j].f->name == 'K' and copy.black_threat[i][j] == true) {
-          return false;
-        }
-        if (current_move == 'b' and copy.board[i][j].col_of_figure == 'b' and copy.board[i][j].f->name == 'K' and copy.white_threat[i][j] == false) {
-          return true;
-        }
-        if (current_move == 'b' and copy.board[i][j].col_of_figure == 'b' and copy.board[i][j].f->name == 'K' and copy.white_threat[i][j] == true) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  bool Make_move(std::string move) {
-    if (move == "/start" or move == "/s") {
-      std::cout << "Starting new game..." << std::endl;
-      StartPosition();
-      return false;
-    }
-    if (move == "/quit" or move == "/q" or move == "/exit") {
-      std::cout << "Quitting..." << std::endl;
-      Clear();
-      exit(0);
-      return false;
-    }
-    if (move == "0-0-0") {
-      if (current_move == 'w') {
-        if (move_number[0] != 0 or move_number[2] != 0)
-          return false;
-        if (board[0][1].col_of_figure != 'e' or
-            board[0][2].col_of_figure != 'e' or
-            board[0][3].col_of_figure != 'e')
-          return false;
-        if (black_threat[0][2] or black_threat[0][3] or black_threat[0][4])
-          return false;
-        move_number[0] = 1;
-        move_number[2] = 1;
-        board[0][2] = board[0][4];
-        board[0][4].f = nullptr;
-        board[0][4].col_of_figure = 'e';
-        board[0][3].f = board[0][0].f;
-        board[0][3].col_of_figure = 'w';
-        board[0][0].f = nullptr;
-        board[0][0].col_of_figure = 'e';
-        Obnova(*this);
-        return true;
-      }
-      if (current_move == 'b') {
-        if (move_number[1] != 0 or move_number[4] != 0)
-          return false;
-        if (board[7][1].col_of_figure != 'e' or
-            board[7][2].col_of_figure != 'e' or
-            board[7][3].col_of_figure != 'e')
-          return false;
-        if (white_threat[7][2] or white_threat[7][3] or white_threat[7][4])
-          return false;
-        move_number[1] = 1;
-        move_number[4] = 1;
-        board[7][2] = board[7][4];
-        board[7][4].f = nullptr;
-        board[7][4].col_of_figure = 'e';
-        board[7][3].f = board[7][0].f;
-        board[7][3].col_of_figure = 'b';
-        board[7][0].f = nullptr;
-        board[7][0].col_of_figure = 'e';
-        Obnova(*this);
-        return true;
-      }
-    }
-    if (move == "0-0") {
-      if (current_move == 'w') {
-        if (move_number[0] != 0 or move_number[3] != 0)
-          return false;
-        if (board[0][5].col_of_figure != 'e' or
-            board[0][6].col_of_figure != 'e')
-          return false;
-        if (black_threat[0][4] or black_threat[0][5] or black_threat[0][6])
-          return false;
-        move_number[0] = 1;
-        move_number[3] = 1;
-        board[0][6] = board[0][4];
-        board[0][4].f = nullptr;
-        board[0][4].col_of_figure = 'e';
-        board[0][5].f = board[0][7].f;
-        board[0][5].col_of_figure = 'w';
-        board[0][7].f = nullptr;
-        board[0][7].col_of_figure = 'e';
-        Obnova(*this);
-        return true;
-      }
-      if (current_move == 'b') {
-        if (move_number[1] != 0 or move_number[5] != 0)
-          return false;
-        if (board[7][5].col_of_figure != 'e' or
-            board[7][6].col_of_figure != 'e')
-          return false;
-        if (white_threat[7][4] or white_threat[7][5] or white_threat[7][6])
-          return false;
-        move_number[1] = 1;
-        move_number[5] = 1;
-        board[7][6] = board[7][4];
-        board[7][4].f = nullptr;
-        board[7][4].col_of_figure = 'e';
-        board[7][5].f = board[7][7].f;
-        board[7][5].col_of_figure = 'b';
-        board[7][7].f = nullptr;
-        board[7][7].col_of_figure = 'e';
-        Obnova(*this);
-        return true;
-      }
-    }
-    if (move.size() != 6)
-      return false;
-    if (move[3] != '-' and move[3] != 'x' and move[3] != ' ')
-      return false;
-    if (move[1] < 'a' or move[1] > 'h')
-      return false;
-    if (move[4] < 'a' or move[4] > 'h')
-      return false;
-    if (move[2] < '1' or move[2] > '8')
-      return false;
-    if (move[5] < '1' or move[5] > '8')
-      return false;
-    char name = move[0];
-    Point first(move[1] - 'a', move[2] - '1');
-    Point second(move[4] - 'a', move[5] - '1');
-    if (Is_possible(name, first, second)) {
-      if (board[second.x][second.y].f != nullptr) {
-        delete board[second.x][second.y].f;
-        board[second.x][second.y].f = nullptr;
-        board[second.x][second.y].col_of_figure = 'e';
-      }
-      board[second.x][second.y].f = board[first.x][first.y].f;
-      board[second.x][second.y].col_of_figure =
-          board[first.x][first.y].col_of_figure;
-      board[first.x][first.y].f = nullptr;
-      board[first.x][first.y].col_of_figure = 'e';
-      Obnova(*this);
-      return true;
-    }
-    return false;
-  }
+  inline bool Is_possible(char name, Point first, Point second) const;
+  inline bool Premove(Point first, Point second) const;
+  inline int Make_move(std::string move);
 };
 
+void Obnova(Board &b);
+
+bool Board::Is_possible(char name, Point first, Point second) const {
+  if (board[first.x][first.y].f == nullptr ||
+      board[first.x][first.y].f->name != name || first == second) {
+    return false;
+  }
+  if (board[first.x][first.y].col_of_figure != current_move) {
+    return false;
+  }
+
+  bool flag = false;
+  auto a = board[first.x][first.y].f->ach(first, current_move);
+  for (auto x : a) {
+    if (second == x) {
+      flag = true;
+      break;
+    }
+  }
+  if (flag == false) {
+    return false;
+  }
+
+  auto achiev = dostig(first, false);
+  for (auto x : achiev) {
+    if (x == second && Premove(first, second)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool Board::Premove(Point first, Point second) const {
+  Board copy = *this;
+  if (copy.board[second.x][second.y].f != nullptr) {
+    // delete copy.board[second.x][second.y].f;
+    copy.board[second.x][second.y].f = nullptr;
+    copy.board[second.x][second.y].col_of_figure = 'e';
+  }
+  copy.board[second.x][second.y].f = copy.board[first.x][first.y].f;
+  copy.board[second.x][second.y].col_of_figure =
+      copy.board[first.x][first.y].col_of_figure;
+  copy.board[first.x][first.y].f = nullptr;
+  copy.board[first.x][first.y].col_of_figure = 'e';
+  Obnova(copy);
+
+  for (int i = 0; i < 8; ++i) {
+    for (int j = 0; j < 8; ++j) {
+      if (current_move == 'w' && copy.board[i][j].col_of_figure == 'w' &&
+          copy.board[i][j].f->name == 'K' && copy.black_threat[i][j] == false) {
+        return true;
+      }
+      if (current_move == 'w' && copy.board[i][j].col_of_figure == 'w' &&
+          copy.board[i][j].f->name == 'K' && copy.black_threat[i][j] == true) {
+        return false;
+      }
+      if (current_move == 'b' && copy.board[i][j].col_of_figure == 'b' &&
+          copy.board[i][j].f->name == 'K' && copy.white_threat[i][j] == false) {
+        return true;
+      }
+      if (current_move == 'b' && copy.board[i][j].col_of_figure == 'b' &&
+          copy.board[i][j].f->name == 'K' && copy.white_threat[i][j] == true) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+int Board::Make_move(std::string move) {
+  if (move == "/start" || move == "/s") {
+    std::cout << "Starting new game..." << std::endl;
+    StartPosition();
+    return -1;
+  }
+  if (move == "/quit" || move == "/q" || move == "/exit") {
+    std::cout << "Quitting..." << std::endl;
+    Clear();
+    exit(0);
+    return false;
+  }
+  if (move == "/history" || move == "/h") {
+    std::cout << (history.size() == 0 ? "No moves yet" : "History:") << "\n";
+    for (int i = 1; i < history.size(); i += 2) {
+      std::cout << (i + 1) / 2 << ". " << history[i - 1] << " " << history[i]
+                << "\n";
+    }
+    if (history.size() % 2 == 1) {
+      std::cout << (history.size() + 1) / 2 << ". " << history.back() << "\n";
+    }
+    std::cout << "\nMake your move: \n";
+    std::getline(std::cin, move);
+    return Make_move(move);
+  }
+  if (move == "0-0-0") {
+    if (current_move == 'w') {
+      if (move_number[0] != 0 || move_number[2] != 0)
+        return false;
+      if (board[1][0].col_of_figure != 'e' ||
+          board[2][0].col_of_figure != 'e' || board[3][0].col_of_figure != 'e')
+        return false;
+      if (black_threat[2][0] || black_threat[3][0] || black_threat[4][0])
+        return false;
+      move_number[0] = 1;
+      move_number[2] = 1;
+      board[2][0] = board[4][0];
+      board[4][0].f = nullptr;
+      board[4][0].col_of_figure = 'e';
+      board[3][0].f = board[0][0].f;
+      board[3][0].col_of_figure = 'w';
+      board[0][0].f = nullptr;
+      board[0][0].col_of_figure = 'e';
+      history.push_back("0-0-0");
+      return true;
+    }
+    if (current_move == 'b') {
+      if (move_number[1] != 0 || move_number[4] != 0)
+        return false;
+      if (board[1][7].col_of_figure != 'e' ||
+          board[2][7].col_of_figure != 'e' || board[3][7].col_of_figure != 'e')
+        return false;
+      if (white_threat[2][7] || white_threat[3][7] || white_threat[4][7])
+        return false;
+      move_number[1] = 1;
+      move_number[4] = 1;
+      board[2][7] = board[4][7];
+      board[4][7].f = nullptr;
+      board[4][7].col_of_figure = 'e';
+      board[3][7].f = board[0][7].f;
+      board[3][7].col_of_figure = 'b';
+      board[0][7].f = nullptr;
+      board[0][7].col_of_figure = 'e';
+      history.push_back("0-0-0");
+      return true;
+    }
+  }
+  if (move == "0-0") {
+    if (current_move == 'w') {
+      if (move_number[0] != 0 || move_number[3] != 0)
+        return false;
+      if (board[5][0].col_of_figure != 'e' || board[6][0].col_of_figure != 'e')
+        return false;
+      if (black_threat[4][0] || black_threat[5][0] || black_threat[6][0])
+        return false;
+      move_number[0] = 1;
+      move_number[3] = 1;
+      board[6][0] = board[4][0];
+      board[4][0].f = nullptr;
+      board[4][0].col_of_figure = 'e';
+      board[5][0].f = board[7][0].f;
+      board[5][0].col_of_figure = 'w';
+      board[7][0].f = nullptr;
+      board[7][0].col_of_figure = 'e';
+      history.push_back("0-0");
+      return true;
+    }
+    if (current_move == 'b') {
+      if (move_number[1] != 0 || move_number[5] != 0)
+        return false;
+      if (board[5][7].col_of_figure != 'e' || board[6][7].col_of_figure != 'e')
+        return false;
+      if (white_threat[4][7] || white_threat[5][7] || white_threat[6][7])
+        return false;
+      move_number[1] = 1;
+      move_number[5] = 1;
+      board[6][7] = board[4][7];
+      board[4][7].f = nullptr;
+      board[4][7].col_of_figure = 'e';
+      board[5][7].f = board[7][7].f;
+      board[5][7].col_of_figure = 'b';
+      board[7][7].f = nullptr;
+      board[7][7].col_of_figure = 'e';
+      history.push_back("0-0");
+      return true;
+    }
+  }
+
+  if (move.size() != 6)
+    return false;
+  if (move[3] != '-' && move[3] != 'x' && move[3] != ' ')
+    return false;
+  if (move[1] < 'a' || move[1] > 'h')
+    return false;
+  if (move[4] < 'a' || move[4] > 'h')
+    return false;
+  if (move[2] < '1' || move[2] > '8')
+    return false;
+  if (move[5] < '1' || move[5] > '8')
+    return false;
+  char name = move[0];
+  Point first(move[1] - 'a', move[2] - '1');
+  Point second(move[4] - 'a', move[5] - '1');
+
+  if (Is_possible(name, first, second)) {
+    if (first.x == 0 && first.y == 0) {
+      move_number[2] = 1;
+    } else if (first.x == 7 && first.y == 0) {
+      move_number[3] = 1;
+    } else if (first.x == 0 && first.y == 7) {
+      move_number[4] = 1;
+    } else if (first.x == 7 && first.y == 7) {
+      move_number[5] = 1;
+    } else if (first.x == 4 && first.y == 0) {
+      move_number[0] = 1;
+    } else if (first.x == 4 && first.y == 7) {
+      move_number[1] = 1;
+    }
+    if (board[second.x][second.y].f != nullptr) {
+      delete board[second.x][second.y].f;
+      board[second.x][second.y].f = nullptr;
+      board[second.x][second.y].col_of_figure = 'e';
+    }
+    board[second.x][second.y].f = board[first.x][first.y].f;
+    board[second.x][second.y].col_of_figure =
+        board[first.x][first.y].col_of_figure;
+    board[first.x][first.y].f = nullptr;
+    board[first.x][first.y].col_of_figure = 'e';
+    move[3] = '-';
+    history.push_back(move);
+    return true;
+  }
+  return false;
+}
