@@ -23,6 +23,7 @@ int main() {
   while (true) {
     std::getline(std::cin, move);
     if (b.Make_move(move)) {
+
       b.Print();
       if (b.current_move == 'b') {
         b.current_move = 'w';
