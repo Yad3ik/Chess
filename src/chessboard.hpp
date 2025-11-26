@@ -426,8 +426,6 @@ struct Board {
     move_number[3] = 0;
     move_number[4] = 0;
     move_number[5] = 0;
-
-    Print();
   }
 
   void Clear() {

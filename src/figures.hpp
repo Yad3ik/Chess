@@ -9,7 +9,7 @@ struct BaseFigure {
 };
 
 struct Knight : BaseFigure {
-  std::vector<Point> threat(const Point &p) {
+  std::vector<Point> threat(const Point &p) override {
     std::vector<Point> answer;
     for (int i = 0; i < 8; ++i) {
       for (int j = 0; j < 8; ++j) {
@@ -24,7 +24,7 @@ struct Knight : BaseFigure {
 };
 
 struct Bishop : BaseFigure {
-  std::vector<Point> threat(const Point &p) {
+  std::vector<Point> threat(const Point &p) override {
     std::vector<Point> answer;
     for (int i = 0; i < 8; ++i) {
       for (int j = 0; j < 8; ++j) {
@@ -38,7 +38,7 @@ struct Bishop : BaseFigure {
 };
 
 struct King : BaseFigure {
-  std::vector<Point> threat(const Point &p) {
+  std::vector<Point> threat(const Point &p) override {
     std::vector<Point> answer;
     for (int i = 0; i < 8; ++i) {
       for (int j = 0; j < 8; ++j) {
@@ -53,7 +53,7 @@ struct King : BaseFigure {
 };
 
 struct Rook : BaseFigure {
-  std::vector<Point> threat(const Point &p) {
+  std::vector<Point> threat(const Point &p) override {
     std::vector<Point> answer;
     for (int i = 0; i < 8; ++i) {
       for (int j = 0; j < 8; ++j) {
@@ -67,7 +67,7 @@ struct Rook : BaseFigure {
 };
 
 struct Pawn : BaseFigure {
-  std::vector<Point> threat(const Point &p) {
+  std::vector<Point> threat(const Point &p) override {
     std::vector<Point> answer;
     for (int i = 0; i < 8; ++i) {
       for (int j = 0; j < 8; ++j) {
@@ -79,7 +79,7 @@ struct Pawn : BaseFigure {
     return answer;
   }
 
-  std::vector<Point> ach(const Point &p, char col) {
+  std::vector<Point> ach(const Point &p, char col) override {
     std::vector<Point> answer;
     if (col == 'w') {
       answer.push_back(Point(p.x, p.y + 1));
@@ -101,7 +101,7 @@ struct Pawn : BaseFigure {
 };
 
 struct Queen : BaseFigure {
-  std::vector<Point> threat(const Point &p) {
+  std::vector<Point> threat(const Point &p) override {
     std::vector<Point> answer;
     for (int i = 0; i < 8; ++i) {
       for (int j = 0; j < 8; ++j) {
